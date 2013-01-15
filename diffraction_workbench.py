@@ -11,6 +11,7 @@ import time
 ### Wishes:
 
 # Disable sources
+# PLot individual sources
 #  
 class PhaseDial(QtGui.QDial):
 	def __init__(self):
@@ -122,7 +123,7 @@ class ArgandHand(QtGui.QGraphicsLineItem):
 		super(ArgandHand, self).__init__(father)		
 		self.scale = scale
 		self.farSceneWidth = farSceneWidth
-		self.color = "#3465a4"		
+		self.color = "#729fcf"		
 		self.arrowTop = QtGui.QGraphicsLineItem(0,0,-10,-7,self)
 		self.arrowBottom = QtGui.QGraphicsLineItem(0,0,-10,+7,self)
 		self.originX = 0
@@ -131,13 +132,13 @@ class ArgandHand(QtGui.QGraphicsLineItem):
 	def draw(self):
 		self.setLine(0,0,self.scale*(self.farSceneWidth/2.0-10),0)
 		self.setPos(self.farSceneWidth/2.0+self.originX ,self.farSceneWidth/2.0+self.originY)
-		self.setPen(QtGui.QPen(QtGui.QColor(self.color),self.scale*2))		
+		self.setPen(QtGui.QPen(QtGui.QColor(self.color),math.sqrt(self.scale)*4))		
 		self.arrowTop.setLine(0,0,self.scale*-10,self.scale*-7)
 		self.arrowTop.setPos(self.scale*(self.farSceneWidth/2.0-10),0)
-		self.arrowTop.setPen(QtGui.QPen(QtGui.QColor(self.color),self.scale*2,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))		
+		self.arrowTop.setPen(QtGui.QPen(QtGui.QColor(self.color),math.sqrt(self.scale)*4,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))		
 		self.arrowBottom.setLine(0,0,self.scale*-10,self.scale*7)
 		self.arrowBottom.setPos(self.scale*(self.farSceneWidth/2.0-10),0)
-		self.arrowBottom.setPen(QtGui.QPen(QtGui.QColor(self.color),self.scale*2,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
+		self.arrowBottom.setPen(QtGui.QPen(QtGui.QColor(self.color),math.sqrt(self.scale)*4,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 	def setScale(self,scale):
 		self.scale = scale
 		self.draw()
@@ -156,15 +157,15 @@ class Argand(QtGui.QGraphicsEllipseItem):
 		farSceneWidth = mainWindow.farSceneWidth
 		self.farSceneWidth = farSceneWidth
 		self.mainWindow = mainWindow
-		self.setPen(QtGui.QColor("#ffffff"))
+		self.setPen(mainWindow.white)
 		self.setPos(0,mainWindow.animationBox.height())
 		line = QtGui.QGraphicsLineItem(farSceneWidth/2.0,10,farSceneWidth/2.0,farSceneWidth-10,self)
-		line.setPen(QtGui.QPen(QtGui.QColor("#ffffff"),1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
+		line.setPen(QtGui.QPen(mainWindow.white,1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		line = QtGui.QGraphicsLineItem(10,farSceneWidth/2.0,farSceneWidth-10,farSceneWidth/2.0,self)
-		line.setPen(QtGui.QPen(QtGui.QColor("#ffffff"),1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
+		line.setPen(QtGui.QPen(mainWindow.white,1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.sources = []
 		self.sumHand = ArgandHand(self,farSceneWidth,1)
-		self.sumHand.setColor("#f57900")
+		self.sumHand.setColor(mainWindow.orange)
 		self.sumHand.hide()
 		self.sumHand.setZValue(1000)
 		self.E = complex(0,0)
@@ -208,10 +209,16 @@ class MainWindow(QtGui.QMainWindow):
 		self.downSampling = 1
 		self.farX = 1e9
 		self.animationStep = 0;
+		self.orange = QtGui.QColor("#f57900")
+		self.skyBlue = QtGui.QColor("#3465a4")
+		self.lightSkyBlue = QtGui.QColor("#729fcf")
+		self.black =  QtGui.QColor("#000000")
+		self.white =  QtGui.QColor("#ffffff")
 		self.initSources()
 		self.initField()
 		self.initUI() 
 		self.toolpanel.nrSourcesSpin.setValue(2)
+
 	def initSources(self):
 		self.nrSources = 1
 		self.sourcePositions = [self.sceneHeight/2]
@@ -266,7 +273,7 @@ class MainWindow(QtGui.QMainWindow):
 
 		scene = QtGui.QGraphicsScene(0, 0, self.nearSceneWidth, self.sceneHeight);
 		graphicsView = QtGui.QGraphicsView(scene)
-		graphicsView.setBackgroundBrush(QtGui.QBrush(QtGui.QColor("#000000")))
+		graphicsView.setBackgroundBrush(QtGui.QBrush(self.black))
 		graphicsView.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
 		graphicsView.setScene(scene)
 		graphicsView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform);
@@ -285,7 +292,7 @@ class MainWindow(QtGui.QMainWindow):
 		graphicsView = QtGui.QGraphicsView(scene)
 		graphicsView.setScene(scene)
 		graphicsView.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
-		graphicsView.setBackgroundBrush(QtGui.QBrush(QtGui.QColor("#000000")))
+		graphicsView.setBackgroundBrush(QtGui.QBrush(self.black))
 		graphicsView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform);
 		self.farScene = scene
 		self.farFieldItem = QtGui.QGraphicsPixmapItem()
@@ -316,7 +323,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.proxy.hide()
 		text = QtGui.QGraphicsTextItem("Source Amplitude")
 		text.setFont(QtGui.QFont("Helvetiva",20))
-		text.setDefaultTextColor(QtGui.QColor("#3465a4"))
+		text.setDefaultTextColor(self.lightSkyBlue)
 		text.setPos(18,self.animationBox.height()+4)
 		self.farScene.addItem(text)
 		self.topArgand = Argand(self)
@@ -324,7 +331,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.topArgand.setPos(0,self.animationBox.height()+26)
 		text = QtGui.QGraphicsTextItem("Total Amplitude")
 		text.setFont(QtGui.QFont("Helvetiva",20))
-		text.setDefaultTextColor(QtGui.QColor("#f57900"))
+		text.setDefaultTextColor(self.orange)
 		text.setPos(27,self.animationBox.height()+self.farSceneWidth+26)
 		self.farScene.addItem(text)
 
@@ -647,22 +654,22 @@ class MainWindow(QtGui.QMainWindow):
 
 		if(self.toolpanel.slitsRadio.isChecked()):
 			wall = QtGui.QGraphicsRectItem(self.baseX-self.slitThickness/2+1,0,self.slitThickness-2,self.sceneHeight)
-			wall.setBrush(QtGui.QBrush(QtGui.QColor("#f57900")))
-			wall.setPen(QtGui.QPen(QtGui.QColor("#f57900")))
+			wall.setBrush(QtGui.QBrush(self.orange))
+			wall.setPen(QtGui.QPen(self.orange))
 			self.nearScene.addItem(wall)
 			self.sourceObjects.append(wall)
 			wall.setZValue(0.5)
 		for i in range(0,self.nrSources):
 			if(self.toolpanel.slitsRadio.isChecked()):
 				source = slitItem(i,self,self.baseX-self.slitThickness/2,self.sourcePositions[i]-self.slitSize[i]/2,self.slitThickness,self.slitSize[i])
-				source.setBrush(QtGui.QBrush(QtGui.QColor("#000000")))
-				source.setPen(QtGui.QPen(QtGui.QColor("#000000")))
+				source.setBrush(QtGui.QBrush(self.black))
+				source.setPen(QtGui.QPen(self.black))
 				source.setZValue(1)
 				self.nearScene.addItem(source)
 				self.sourceObjects.append(source)
 			else:
 				source = pointSourceItem(i,self,self.sourceX[i]-self.pointSize/2,self.sourcePositions[i]-self.pointSize/2,self.pointSize,self.pointSize)
-				source.setBrush(QtGui.QBrush(QtGui.QColor("#f57900")))
+				source.setBrush(QtGui.QBrush(self.orange))
 				source.setPen(QtGui.QPen(QtGui.QColor(255,0,0,0),20))
 				source.setZValue(1)
 				self.nearScene.addItem(source)
@@ -742,12 +749,12 @@ class MainWindow(QtGui.QMainWindow):
 		for i in range(1,len(fx)):
 			p.lineTo(plot_start+(plot_width*fx[i])/scale,i)			
 		path = QtGui.QGraphicsPathItem(p)
-		path.setPen(QtGui.QPen(QtGui.QColor("#3465a4"),3,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
+		path.setPen(QtGui.QPen(self.skyBlue,3,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.plotObjects.append(path)
 		self.farScene.addItem(path)
 		path.setZValue(10)
 		line = QtGui.QGraphicsLineItem(plot_start,0,plot_start,self.sceneHeight)
-		line.setPen(QtGui.QPen(QtGui.QColor("#f57900"),1,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
+		line.setPen(QtGui.QPen(self.orange,1,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.plotObjects.append(line)
 		self.farScene.addItem(line)
 		line.setZValue(9)
@@ -767,6 +774,8 @@ class MainWindow(QtGui.QMainWindow):
 			self.farScene.removeItem(o)
 		self.plotObjects = []
 		if(self.toolpanel.farFieldRadio.isChecked()):
+			self.topArgand.hide()
+			self.bottomArgand.hide()
 #			if(self.toolpanel.amplitudesRadio.isChecked()):
 #				fx = np.real(self.farE*np.exp(1.0j*math.pi*self.globalPhase/180.0))
 #				fx -= np.min(fx[:])
@@ -786,6 +795,8 @@ class MainWindow(QtGui.QMainWindow):
 			self.farScene.addItem(self.farFieldItem)
 			self.plotFarField(fx)
 		else:
+			self.topArgand.show()
+			self.bottomArgand.show()
 			fontSize = 18
 			x = int(self.pointSelection.x())
 			y = int(self.pointSelection.y())
@@ -821,9 +832,9 @@ class MainWindow(QtGui.QMainWindow):
 				line = QtGui.QGraphicsLineItem(self.sourceX[i],self.sourcePositions[i],self.sourceX[i],self.sourcePositions[i])
 				line.setZValue(10)
 				grad = QtGui.QRadialGradient(QtCore.QPointF(self.sourceX[i], self.sourcePositions[i]), self.wavelength);
-				grad.setColorAt(0, QtGui.QColor("#3465a4"))
-				grad.setColorAt(0.5, QtGui.QColor("#f57900"))
-				grad.setColorAt(1, QtGui.QColor("#3465a4"))
+				grad.setColorAt(0, self.skyBlue)
+				grad.setColorAt(0.5, self.orange)
+				grad.setColorAt(1, self.skyBlue)
 				grad.setSpread(QtGui.QGradient.RepeatSpread)
 
 				brush = QtGui.QBrush(grad)

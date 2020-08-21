@@ -4,7 +4,8 @@
 import sys
 import numpy as np
 import math
-from PySide import QtGui, QtCore
+#from PySide import QtWidgets, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import time
 
 
@@ -13,17 +14,17 @@ import time
 # Disable sources
 # PLot individual sources
 #  
-class PhaseDial(QtGui.QDial):
+class PhaseDial(QtWidgets.QDial):
 	def __init__(self):
 		super(PhaseDial, self).__init__()
 	def sizeHint(self):
 		return QtCore.QSize(50,50)
 
 
-class slitItem(QtGui.QGraphicsRectItem):
+class slitItem(QtWidgets.QGraphicsRectItem):
 	def __init__(self,index,mainWindow,x,y,w,h):
 		super(slitItem, self).__init__(0,0,w,h,None)
-		self.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+		self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
 		self.index = index
 		self.mainWindow = mainWindow
 		self.setPos(x,y)
@@ -44,10 +45,10 @@ class slitItem(QtGui.QGraphicsRectItem):
 
 
 
-class pointSourceItem(QtGui.QGraphicsEllipseItem):
+class pointSourceItem(QtWidgets.QGraphicsEllipseItem):
 	def __init__(self,index,mainWindow,x,y,w,h):
 		super(pointSourceItem, self).__init__(0,0,w,h,None)
-		self.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+		self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
 		self.index = index
 		self.mainWindow = mainWindow
 		self.setPos(x,y)
@@ -75,13 +76,13 @@ class pointSourceItem(QtGui.QGraphicsEllipseItem):
 		self.mainWindow.toolpanel.positionSpin.setValue(self.y()+self.mainWindow.pointSize/2)
 		self.mainWindow.toolpanel.positionXSpin.setValue(self.x()+self.mainWindow.pointSize/2)
 
-class pointSelector(QtGui.QGraphicsEllipseItem):
+class pointSelector(QtWidgets.QGraphicsEllipseItem):
 	def __init__(self,mainWindow):
 		super(pointSelector, self).__init__(-mainWindow.pointSize/2.0,-mainWindow.pointSize/2.0,mainWindow.pointSize,mainWindow.pointSize)
-		self.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+		self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
 		self.setBrush(QtGui.QBrush(QtGui.QColor("#cc0000")))
 		self.setPen(QtGui.QPen(QtGui.QColor(255,0,0,0),20))
-		self.setFlag(QtGui.QGraphicsItem.ItemIsMovable)
+		self.setFlag(QtWidgets.QGraphicsItem.ItemIsMovable)
 		self.setPos(mainWindow.nearSceneWidth/2.0,mainWindow.sceneHeight/2.0)
 		self.setZValue(100)
 		self.mainWindow = mainWindow
@@ -89,12 +90,12 @@ class pointSelector(QtGui.QGraphicsEllipseItem):
 		self.max_y = mainWindow.sceneHeight-1
 		self.min_x = mainWindow.baseX
 		self.max_x = mainWindow.nearSceneWidth-1
-		self.xLine = QtGui.QGraphicsLineItem(-mainWindow.nearSceneWidth,0,mainWindow.nearSceneWidth,0,self)
+		self.xLine = QtWidgets.QGraphicsLineItem(-mainWindow.nearSceneWidth,0,mainWindow.nearSceneWidth,0,self)
 		self.xLine.setPen(QtGui.QPen(QtGui.QColor("#3465a4"),2,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
-		self.xLine.setFlag(QtGui.QGraphicsItem.ItemStacksBehindParent)
-		self.yLine = QtGui.QGraphicsLineItem(0,-mainWindow.sceneHeight,0,mainWindow.sceneHeight,self)
+		self.xLine.setFlag(QtWidgets.QGraphicsItem.ItemStacksBehindParent)
+		self.yLine = QtWidgets.QGraphicsLineItem(0,-mainWindow.sceneHeight,0,mainWindow.sceneHeight,self)
 		self.yLine.setPen(QtGui.QPen(QtGui.QColor("#3465a4"),2,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
-		self.yLine.setFlag(QtGui.QGraphicsItem.ItemStacksBehindParent)
+		self.yLine.setFlag(QtWidgets.QGraphicsItem.ItemStacksBehindParent)
 	def mouseMoveEvent(self, event):
 		delta_y = event.scenePos().y()-event.lastScenePos().y()
 		if(self.scenePos().y() + delta_y > self.max_y):
@@ -118,14 +119,14 @@ class pointSelector(QtGui.QGraphicsEllipseItem):
 		self.xLine.show()
 		self.yLine.show()
 
-class ArgandHand(QtGui.QGraphicsLineItem):
+class ArgandHand(QtWidgets.QGraphicsLineItem):
 	def __init__(self,father,farSceneWidth,scale=1):
 		super(ArgandHand, self).__init__(father)		
 		self.scale = scale
 		self.farSceneWidth = farSceneWidth
 		self.color = "#729fcf"		
-		self.arrowTop = QtGui.QGraphicsLineItem(0,0,-10,-7,self)
-		self.arrowBottom = QtGui.QGraphicsLineItem(0,0,-10,+7,self)
+		self.arrowTop = QtWidgets.QGraphicsLineItem(0,0,-10,-7,self)
+		self.arrowBottom = QtWidgets.QGraphicsLineItem(0,0,-10,+7,self)
 		self.originX = 0
 		self.originY = 0
 		self.draw()
@@ -151,7 +152,7 @@ class ArgandHand(QtGui.QGraphicsLineItem):
 		self.draw()
 
 
-class Argand(QtGui.QGraphicsEllipseItem):
+class Argand(QtWidgets.QGraphicsEllipseItem):
 	def __init__(self,mainWindow):
 		super(Argand, self).__init__(10,10,mainWindow.farSceneWidth-20,mainWindow.farSceneWidth-20)
 		farSceneWidth = mainWindow.farSceneWidth
@@ -159,9 +160,9 @@ class Argand(QtGui.QGraphicsEllipseItem):
 		self.mainWindow = mainWindow
 		self.setPen(mainWindow.white)
 		self.setPos(0,mainWindow.animationBox.height())
-		line = QtGui.QGraphicsLineItem(farSceneWidth/2.0,10,farSceneWidth/2.0,farSceneWidth-10,self)
+		line = QtWidgets.QGraphicsLineItem(farSceneWidth/2.0,10,farSceneWidth/2.0,farSceneWidth-10,self)
 		line.setPen(QtGui.QPen(mainWindow.white,1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
-		line = QtGui.QGraphicsLineItem(10,farSceneWidth/2.0,farSceneWidth-10,farSceneWidth/2.0,self)
+		line = QtWidgets.QGraphicsLineItem(10,farSceneWidth/2.0,farSceneWidth-10,farSceneWidth/2.0,self)
 		line.setPen(QtGui.QPen(mainWindow.white,1,QtCore.Qt.DashLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.sources = []
 		self.sumHand = ArgandHand(self,farSceneWidth,1)
@@ -196,7 +197,21 @@ class Argand(QtGui.QGraphicsEllipseItem):
 		else:
 			self.sumHand.hide()
 
-class MainWindow(QtGui.QMainWindow): 
+class MyScene(QtWidgets.QGraphicsScene):
+        def __init__(self, parent, x,y,w,h):
+                super(MyScene, self).__init__(x,y,w,h)
+                self.parent = parent
+        def mousePressEvent(self, mouseEvent):
+                mouseEvent.ignore()
+                return
+                if(QtWidgets.QApplication.activeWindow().toolpanel.farFieldRadio.isChecked()):
+                        print('here')                                               
+                        self.parent.onSceneClick(mouseEvent)
+                else:
+                        mouseEvent.ignore()
+                return
+                        
+class MainWindow(QtWidgets.QMainWindow): 
 	def __init__(self):
 		super(MainWindow, self).__init__()
 		self.sceneHeight = 650
@@ -208,7 +223,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.baseX = 10
 		self.downSampling = 1
 		self.farX = 1e9
-		self.animationStep = 0;
+		self.animationStep = 1;
 		self.orange = QtGui.QColor("#f57900")
 		self.skyBlue = QtGui.QColor("#3465a4")
 		self.lightSkyBlue = QtGui.QColor("#729fcf")
@@ -245,19 +260,41 @@ class MainWindow(QtGui.QMainWindow):
 
 		self.farE = np.zeros((self.sceneHeight/self.downSampling),complex)
 	def initUI(self):		
-		hbox = QtGui.QHBoxLayout()
+		hbox = QtWidgets.QHBoxLayout()
 		view = self.initNearView()
 #		hbox.addStretch()
 		hbox.addWidget(view)
-		view = self.initFarView()
-		hbox.addWidget(view)
+
+                vbox = QtWidgets.QVBoxLayout()
+                self.animationBox = QtWidgets.QGroupBox("Selected Point");
+		self.animationBox.resize(self.farSceneWidth,self.sceneHeight/5)
+		self.animationBox.setLayout(QtWidgets.QVBoxLayout())
+		self.animationBoxX = QtWidgets.QLabel()
+		self.animationBox.layout().addWidget(self.animationBoxX)
+		self.animationBoxY = QtWidgets.QLabel()
+		self.animationBox.layout().addWidget(self.animationBoxY)
+		self.animationBoxE = QtWidgets.QLabel()
+		self.animationBox.layout().addWidget(self.animationBoxE)
+		self.animationBox.layout().addSpacing(20)
+		self.animationBoxStep =  QtWidgets.QLabel()
+		self.animationBox.layout().addWidget(self.animationBoxStep)
+		self.animationSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		self.animationSlider.setValue(self.animationStep)
+		self.animationSlider.valueChanged.connect(self.onAnimationSliderValueChanged)
+		self.animationBox.layout().addWidget(self.animationSlider)
+		vbox.addWidget(self.animationBox)
+                view = self.initFarView()
+                vbox.addWidget(view)
+                hbox.addLayout(vbox)
+		#hbox.addWidget(view)
+                self.farView = view
 		toolpanel = self.initToolPanel()
 		self.toolpanel = toolpanel
 		hbox.addWidget(toolpanel)
 		hbox.addStretch()
 		self.statusBar().showMessage('Ready')       
 		self.setWindowTitle('Diffraction Workbench')    
-		widget = QtGui.QWidget()
+		widget = QtWidgets.QWidget()
 		widget.setLayout(hbox)
 		self.setCentralWidget(widget)
 		self.drawField()
@@ -271,14 +308,16 @@ class MainWindow(QtGui.QMainWindow):
 		self.sourceObjects = []
 		self.sourceLines = []
 
-		scene = QtGui.QGraphicsScene(0, 0, self.nearSceneWidth, self.sceneHeight);
-		graphicsView = QtGui.QGraphicsView(scene)
+		# scene = MyScene(self, 0, 0, self.nearSceneWidth, self.sceneHeight);
+                scene = QtWidgets.QGraphicsScene(0, 0, self.nearSceneWidth, self.sceneHeight);
+		graphicsView = QtWidgets.QGraphicsView(scene)
 		graphicsView.setBackgroundBrush(QtGui.QBrush(self.black))
-		graphicsView.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+		graphicsView.setSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Fixed)
 		graphicsView.setScene(scene)
 		graphicsView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform);
+                graphicsView.setMouseTracking(True)
 		self.nearScene = scene
-		self.fieldItem = QtGui.QGraphicsPixmapItem()
+		self.fieldItem = QtWidgets.QGraphicsPixmapItem()
 		scene.addItem(self.fieldItem)
 		self.fieldItem.setScale(self.downSampling)
 		self.fieldItem.setTransformationMode(QtCore.Qt.SmoothTransformation)
@@ -288,40 +327,43 @@ class MainWindow(QtGui.QMainWindow):
 		return graphicsView
 	def initFarView(self):
 		self.plotObjects = []
-		scene = QtGui.QGraphicsScene(0, 0, self.farSceneWidth, self.sceneHeight);
-		graphicsView = QtGui.QGraphicsView(scene)
+		scene = QtWidgets.QGraphicsScene(0, 0, self.farSceneWidth, self.sceneHeight);
+                #scene = MyScene(self, 0, 0, self.farSceneWidth, self.sceneHeight);
+		graphicsView = QtWidgets.QGraphicsView(scene)
 		graphicsView.setScene(scene)
-		graphicsView.setSizePolicy(QtGui.QSizePolicy.Fixed,QtGui.QSizePolicy.Fixed)
+		graphicsView.setSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Maximum)
+                graphicsView.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+                graphicsView.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 		graphicsView.setBackgroundBrush(QtGui.QBrush(self.black))
 		graphicsView.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.SmoothPixmapTransform);
 		self.farScene = scene
-		self.farFieldItem = QtGui.QGraphicsPixmapItem()
+		self.farFieldItem = QtWidgets.QGraphicsPixmapItem()
 		scene.addItem(self.farFieldItem)
-		self.farFieldPlot = QtGui.QGraphicsPixmapItem()
+		self.farFieldPlot = QtWidgets.QGraphicsPixmapItem()
 		scene.addItem(self.farFieldPlot)
 
 		self.farFieldItem.setScale(self.downSampling)
 		self.farFieldItem.setTransformationMode(QtCore.Qt.SmoothTransformation)
 
-		self.animationBox = QtGui.QGroupBox("Selected Point");
-		self.animationBox.resize(self.farSceneWidth,self.sceneHeight/5)
-		self.animationBox.setLayout(QtGui.QVBoxLayout())
-		self.animationBoxX = QtGui.QLabel()
-		self.animationBox.layout().addWidget(self.animationBoxX)
-		self.animationBoxY = QtGui.QLabel()
-		self.animationBox.layout().addWidget(self.animationBoxY)
-		self.animationBoxE = QtGui.QLabel()
-		self.animationBox.layout().addWidget(self.animationBoxE)
-		self.animationBox.layout().addSpacing(20)
-		self.animationBoxStep =  QtGui.QLabel()
-		self.animationBox.layout().addWidget(self.animationBoxStep)
-		self.animationSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
-		self.animationSlider.setValue(self.animationStep)
-		self.animationSlider.valueChanged.connect(self.onAnimationSliderValueChanged)
-		self.animationBox.layout().addWidget(self.animationSlider)
-		self.proxy = self.farScene.addWidget(self.animationBox);
-		self.proxy.hide()
-		text = QtGui.QGraphicsTextItem("Source Amplitude")
+		# self.animationBox = QtWidgets.QGroupBox("Selected Point");
+		# self.animationBox.resize(self.farSceneWidth,self.sceneHeight/5)
+		# self.animationBox.setLayout(QtWidgets.QVBoxLayout())
+		# self.animationBoxX = QtWidgets.QLabel()
+		# self.animationBox.layout().addWidget(self.animationBoxX)
+		# self.animationBoxY = QtWidgets.QLabel()
+		# self.animationBox.layout().addWidget(self.animationBoxY)
+		# self.animationBoxE = QtWidgets.QLabel()
+		# self.animationBox.layout().addWidget(self.animationBoxE)
+		# self.animationBox.layout().addSpacing(20)
+		# self.animationBoxStep =  QtWidgets.QLabel()
+		# self.animationBox.layout().addWidget(self.animationBoxStep)
+		# self.animationSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+		# self.animationSlider.setValue(self.animationStep)
+		# self.animationSlider.valueChanged.connect(self.onAnimationSliderValueChanged)
+		# self.animationBox.layout().addWidget(self.animationSlider)
+		# self.proxy = self.farScene.addWidget(self.animationBox);
+		# self.proxy.hide()
+		text = QtWidgets.QGraphicsTextItem("Source Amplitude")
 		text.setFont(QtGui.QFont("Helvetiva",20))
 		text.setDefaultTextColor(self.lightSkyBlue)
 		text.setPos(18,self.animationBox.height()+4)
@@ -329,7 +371,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.topArgand = Argand(self)
 		self.topArgand.hand = ArgandHand(self.topArgand,self.farSceneWidth)
 		self.topArgand.setPos(0,self.animationBox.height()+26)
-		text = QtGui.QGraphicsTextItem("Total Amplitude")
+		text = QtWidgets.QGraphicsTextItem("Total Amplitude")
 		text.setFont(QtGui.QFont("Helvetiva",20))
 		text.setDefaultTextColor(self.orange)
 		text.setPos(27,self.animationBox.height()+self.farSceneWidth+26)
@@ -343,44 +385,44 @@ class MainWindow(QtGui.QMainWindow):
 		self.farScene.addItem(self.bottomArgand)
 		return graphicsView
 	def initToolPanel(self):
-		toolpanel = QtGui.QWidget();
+		toolpanel = QtWidgets.QWidget();
 		self.toolpanel = toolpanel
-		vbox = QtGui.QVBoxLayout()
+		vbox = QtWidgets.QVBoxLayout()
 		vbox.addStretch()
 		toolpanel.setLayout(vbox)
-		sourceGroup = QtGui.QGroupBox("Source Type")
-		sourceGroup.setLayout(QtGui.QVBoxLayout())
-		toolpanel.pointsRadio = QtGui.QRadioButton("Points")
+		sourceGroup = QtWidgets.QGroupBox("Source Type")
+		sourceGroup.setLayout(QtWidgets.QVBoxLayout())
+		toolpanel.pointsRadio = QtWidgets.QRadioButton("Points")
 		toolpanel.pointsRadio.setChecked(True)
-		toolpanel.slitsRadio = QtGui.QRadioButton("Slits")
+		toolpanel.slitsRadio = QtWidgets.QRadioButton("Slits")
 		toolpanel.slitsRadio.toggled.connect(self.onSlitsRadioToggled)
 		sourceGroup.layout().addWidget(toolpanel.pointsRadio)
 		sourceGroup.layout().addWidget(toolpanel.slitsRadio)
 		vbox.addWidget(sourceGroup)
 
-		hbox = QtGui.QHBoxLayout()
-		hbox.addWidget(QtGui.QLabel("Nr. of sources: "))
-		toolpanel.nrSourcesSpin = QtGui.QSpinBox()
+		hbox = QtWidgets.QHBoxLayout()
+		hbox.addWidget(QtWidgets.QLabel("Nr. of sources: "))
+		toolpanel.nrSourcesSpin = QtWidgets.QSpinBox()
 		toolpanel.nrSourcesSpin.setMinimum(1)
 		toolpanel.nrSourcesSpin.setMaximum(5)
 		toolpanel.nrSourcesSpin.valueChanged.connect(self.onNrSourcesSpinValueChanged)
 		hbox.addWidget(toolpanel.nrSourcesSpin)
 		vbox.addLayout(hbox)
 		
-		positionGroup = QtGui.QGroupBox("Source Properties")
-		positionGroup.setLayout(QtGui.QVBoxLayout())
-		hbox = QtGui.QHBoxLayout()
-		hbox.addWidget(QtGui.QLabel("Selected source: "))
-		toolpanel.selectedSourceSpin = QtGui.QSpinBox()
+		positionGroup = QtWidgets.QGroupBox("Source Properties")
+		positionGroup.setLayout(QtWidgets.QVBoxLayout())
+		hbox = QtWidgets.QHBoxLayout()
+		hbox.addWidget(QtWidgets.QLabel("Selected source: "))
+		toolpanel.selectedSourceSpin = QtWidgets.QSpinBox()
 		toolpanel.selectedSourceSpin.setMinimum(1)		
 		toolpanel.selectedSourceSpin.setMaximum(self.nrSources)	
 		toolpanel.selectedSourceSpin.valueChanged.connect(self.onSelectedSourceSpinValueChanged)	
 		hbox.addWidget(toolpanel.selectedSourceSpin)
 		positionGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		hbox.addWidget(QtGui.QLabel("Y Position: "))
-		toolpanel.positionSpin = QtGui.QSpinBox()
+		hbox = QtWidgets.QHBoxLayout()
+		hbox.addWidget(QtWidgets.QLabel("Y Position: "))
+		toolpanel.positionSpin = QtWidgets.QSpinBox()
 		toolpanel.positionSpin.setMaximum(self.sceneHeight)
 		toolpanel.positionSpin.setValue(self.sourcePositions[toolpanel.selectedSourceSpin.value()-1])
 		toolpanel.positionSpin.valueChanged.connect(self.onPositionSpinValueChanged)	
@@ -388,10 +430,10 @@ class MainWindow(QtGui.QMainWindow):
 
 		positionGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.positionXLabel = QtGui.QLabel("X Position: ")
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.positionXLabel = QtWidgets.QLabel("X Position: ")
 		hbox.addWidget(toolpanel.positionXLabel)
-		toolpanel.positionXSpin = QtGui.QSpinBox()
+		toolpanel.positionXSpin = QtWidgets.QSpinBox()
 		toolpanel.positionXSpin.setMaximum(self.nearSceneWidth/3-1)
 		toolpanel.positionXSpin.setMinimum(self.baseX)
 		toolpanel.positionXSpin.setValue(self.sourceX[toolpanel.selectedSourceSpin.value()-1])
@@ -400,25 +442,25 @@ class MainWindow(QtGui.QMainWindow):
 
 		positionGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.phaseShiftLabel = QtGui.QLabel("Phase Shift: ")
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.phaseShiftLabel = QtWidgets.QLabel("Phase Shift: ")
 		hbox.addWidget(toolpanel.phaseShiftLabel)		
 		toolpanel.phaseShiftDial = PhaseDial()
 		toolpanel.phaseShiftDial.setWrapping(True)
 		toolpanel.phaseShiftDial.setMaximum(359)
 		toolpanel.phaseShiftDial.setValue(0)
 		toolpanel.phaseShiftDial.valueChanged.connect(self.onPhaseShiftDialValueChanged)
-		toolpanel.phaseShiftDisplay = QtGui.QLCDNumber()
+		toolpanel.phaseShiftDisplay = QtWidgets.QLCDNumber()
 		toolpanel.phaseShiftDisplay.setNumDigits(3)
 		toolpanel.phaseShiftDial.valueChanged.connect(toolpanel.phaseShiftDisplay.display)
 		hbox.addWidget(toolpanel.phaseShiftDial)		
 		hbox.addWidget(toolpanel.phaseShiftDisplay)
 		positionGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.slitSizeLabel = QtGui.QLabel("Slit size: ")
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.slitSizeLabel = QtWidgets.QLabel("Slit size: ")
 		hbox.addWidget(toolpanel.slitSizeLabel)
-		toolpanel.slitSizeSpin = QtGui.QSpinBox()
+		toolpanel.slitSizeSpin = QtWidgets.QSpinBox()
 		toolpanel.slitSizeSpin.setMinimum(1)
 		toolpanel.slitSizeSpin.setMaximum(200)
 		toolpanel.slitSizeSpin.setValue(self.slitSize[toolpanel.selectedSourceSpin.value()-1])
@@ -430,37 +472,37 @@ class MainWindow(QtGui.QMainWindow):
 
 		vbox.addWidget(positionGroup)
 
-		beamGroup = QtGui.QGroupBox("Beam Properties")
-		beamGroup.setLayout(QtGui.QVBoxLayout())
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.wavelengthSpin = QtGui.QSpinBox()
+		beamGroup = QtWidgets.QGroupBox("Beam Properties")
+		beamGroup.setLayout(QtWidgets.QVBoxLayout())
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.wavelengthSpin = QtWidgets.QSpinBox()
 		toolpanel.wavelengthSpin.setMinimum(20)
 		toolpanel.wavelengthSpin.setMaximum(400)
 		toolpanel.wavelengthSpin.setValue(self.wavelength)
 		toolpanel.wavelengthSpin.valueChanged.connect(self.onWavelengthSpinValueChanged)
-		hbox.addWidget(QtGui.QLabel("Wavelength: "))
+		hbox.addWidget(QtWidgets.QLabel("Wavelength: "))
 		hbox.addWidget(toolpanel.wavelengthSpin)
 		beamGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.phaseLabel = QtGui.QLabel("Global phase: ")
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.phaseLabel = QtWidgets.QLabel("Global phase: ")
 		hbox.addWidget(toolpanel.phaseLabel)
 		toolpanel.phaseDial = PhaseDial()
 		toolpanel.phaseDial.setWrapping(True)
 		toolpanel.phaseDial.setMaximum(359)
 		toolpanel.phaseDial.setValue(self.globalPhase)
 		toolpanel.phaseDial.valueChanged.connect(self.onPhaseDialValueChanged)
-		toolpanel.phaseDisplay = QtGui.QLCDNumber()
+		toolpanel.phaseDisplay = QtWidgets.QLCDNumber()
 		toolpanel.phaseDisplay.setNumDigits(3)
 		toolpanel.phaseDial.valueChanged.connect(toolpanel.phaseDisplay.display)
 		hbox.addWidget(toolpanel.phaseDial)
 		hbox.addWidget(toolpanel.phaseDisplay)
 		beamGroup.layout().addLayout(hbox)
 
-		hbox = QtGui.QHBoxLayout()
-		toolpanel.simulateTimeLabel = QtGui.QLabel("Simulate Time: ")
+		hbox = QtWidgets.QHBoxLayout()
+		toolpanel.simulateTimeLabel = QtWidgets.QLabel("Simulate Time: ")
 		hbox.addWidget(toolpanel.simulateTimeLabel)		
-		toolpanel.simulateTimeCheck = QtGui.QCheckBox()
+		toolpanel.simulateTimeCheck = QtWidgets.QCheckBox()
 		toolpanel.simulateTimeCheck.toggled.connect(self.onSimulateTimeCheckToggled)
 
 		hbox.addWidget(toolpanel.simulateTimeCheck)
@@ -469,14 +511,14 @@ class MainWindow(QtGui.QMainWindow):
 		vbox.addWidget(beamGroup)
 
 
-		displayGroup = QtGui.QGroupBox("Left Display")
-		displayGroup.setLayout(QtGui.QVBoxLayout())
+		displayGroup = QtWidgets.QGroupBox("Left Display")
+		displayGroup.setLayout(QtWidgets.QVBoxLayout())
 
-#		displayWhatGroup = QtGui.QGroupBox("Variable")
-#		displayWhatGroup.setLayout(QtGui.QVBoxLayout())
-		toolpanel.intensitiesRadio = QtGui.QRadioButton("Averaged Intensities")
+#		displayWhatGroup = QtWidgets.QGroupBox("Variable")
+#		displayWhatGroup.setLayout(QtWidgets.QVBoxLayout())
+		toolpanel.intensitiesRadio = QtWidgets.QRadioButton("Averaged Intensities")
 		toolpanel.intensitiesRadio.toggled.connect(self.onIntensitiesRadioToggled)
-		toolpanel.amplitudesRadio = QtGui.QRadioButton("Instantaneous E Field")
+		toolpanel.amplitudesRadio = QtWidgets.QRadioButton("Instantaneous E Field")
 		toolpanel.amplitudesRadio.setChecked(True)
 		toolpanel.amplitudesRadio.toggled.connect(self.onAmplitudesRadioToggled)
 		displayGroup.layout().addWidget(toolpanel.amplitudesRadio)
@@ -487,12 +529,12 @@ class MainWindow(QtGui.QMainWindow):
 
 		vbox.addWidget(displayGroup)
 
-		plotGroup = QtGui.QGroupBox("Right Display")
-		plotGroup.setLayout(QtGui.QVBoxLayout())
+		plotGroup = QtWidgets.QGroupBox("Right Display")
+		plotGroup.setLayout(QtWidgets.QVBoxLayout())
 
-		toolpanel.farFieldRadio = QtGui.QRadioButton("Far Field Intensities")
+		toolpanel.farFieldRadio = QtWidgets.QRadioButton("Far Field Intensities")
 		toolpanel.farFieldRadio.toggled.connect(self.onFarFieldRadioToggled)
-		toolpanel.pointCalculationRadio = QtGui.QRadioButton("Animate Calculation ")
+		toolpanel.pointCalculationRadio = QtWidgets.QRadioButton("Animate Calculation ")
 		toolpanel.pointCalculationRadio.setVisible(False)
 		toolpanel.farFieldRadio.setChecked(True)
 		plotGroup.layout().addWidget(toolpanel.farFieldRadio)
@@ -504,11 +546,11 @@ class MainWindow(QtGui.QMainWindow):
 		vbox.addWidget(plotGroup)
 
 
-		integrationGroup = QtGui.QGroupBox("Time Integration")
-		integrationGroup.setLayout(QtGui.QVBoxLayout())
+		integrationGroup = QtWidgets.QGroupBox("Time Integration")
+		integrationGroup.setLayout(QtWidgets.QVBoxLayout())
 
-		toolpanel.instantaneousRadio = QtGui.QRadioButton("Instantaneous Values")
-		toolpanel.integratedRadio = QtGui.QRadioButton("Time Integrated Values")	
+		toolpanel.instantaneousRadio = QtWidgets.QRadioButton("Instantaneous Values")
+		toolpanel.integratedRadio = QtWidgets.QRadioButton("Time Integrated Values")	
 		toolpanel.integratedRadio.toggled.connect(self.onTimeIntegratedRadioToggled)
 		toolpanel.integratedRadio.setChecked(True)
 		integrationGroup.layout().addWidget(toolpanel.instantaneousRadio)
@@ -518,7 +560,7 @@ class MainWindow(QtGui.QMainWindow):
 
 #		vbox.addWidget(integrationGroup)
 		vbox.addStretch()
-		toolpanel.setSizePolicy(QtGui.QSizePolicy.Preferred,QtGui.QSizePolicy.Preferred)
+		toolpanel.setSizePolicy(QtWidgets.QSizePolicy.Preferred,QtWidgets.QSizePolicy.Preferred)
 
 		return toolpanel
 	def onNrSourcesSpinValueChanged(self, newValue):
@@ -634,13 +676,13 @@ class MainWindow(QtGui.QMainWindow):
 		if(checked):
 			self.resetAnimation()
 			self.pointSelection.hide()
-			self.proxy.hide()
+			#self.proxy.hide()
 			pass
 		else:
 			self.resetAnimation()
 #			self.animationStep = 0
 			self.pointSelection.show()
-			self.proxy.show()
+			#self.proxy.show()
 		self.drawFarField()
 	def onPhaseShiftDialValueChanged(self,newValue):
 		if(self.phaseShift[self.toolpanel.selectedSourceSpin.value()-1] != newValue):	
@@ -653,7 +695,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.sourceObjects = []
 
 		if(self.toolpanel.slitsRadio.isChecked()):
-			wall = QtGui.QGraphicsRectItem(self.baseX-self.slitThickness/2+1,0,self.slitThickness-2,self.sceneHeight)
+			wall = QtWidgets.QGraphicsRectItem(self.baseX-self.slitThickness/2+1,0,self.slitThickness-2,self.sceneHeight)
 			wall.setBrush(QtGui.QBrush(self.orange))
 			wall.setPen(QtGui.QPen(self.orange))
 			self.nearScene.addItem(wall)
@@ -715,12 +757,12 @@ class MainWindow(QtGui.QMainWindow):
 			farY =  np.linspace(-self.sceneHeight*self.farX/self.nearSceneWidth/2,self.sceneHeight*self.farX/self.nearSceneWidth/2,self.sceneHeight)
 			for i in range(0,self.nrSources):
 				dist = np.sqrt((self.Ex-self.sourceX[i])**2.0+(y-self.sourcePositions[i])**2.0)/self.wavelength
-				self.E += np.exp((-2.0j*math.pi*dist))*np.exp(-2.0j*math.pi*(self.sourceX[i]-self.baseX)/self.wavelength)*np.exp(-2.0j*math.pi*self.phaseShift[i]*math.pi/180.0)
+				self.E += np.exp((-2.0j*math.pi*dist))*np.exp(-2.0j*math.pi*(self.sourceX[i]-self.baseX)/self.wavelength)*np.exp(-1.0j*self.phaseShift[i]*math.pi/180.0)
 				dist = np.sqrt((self.farX-self.sourceX[i])**2.0+(farY-self.sourcePositions[i])**2.0)/self.wavelength
-				self.farE += np.exp((-2.0j*math.pi*dist))*np.exp(-2.0j*math.pi*(self.sourceX[i]-self.baseX)/self.wavelength)*np.exp(-2.0j*math.pi*self.phaseShift[i]*math.pi/180.0)
+				self.farE += np.exp((-2.0j*math.pi*dist))*np.exp(-2.0j*math.pi*(self.sourceX[i]-self.baseX)/self.wavelength)*np.exp(-1.0j*self.phaseShift[i]*math.pi/180.0)
 #		print time.time() - now
 		self.drawField()
-		self.statusBar().showMessage('Done')  
+#		self.statusBar().showMessage('Done')  
 	def drawField(self):
 		if(self.toolpanel.amplitudesRadio.isChecked()):
 			colormap = np.real(self.E*np.exp(1.0j*math.pi*self.globalPhase/180.0))
@@ -738,6 +780,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.fieldItem.setPixmap(self.pixmap)
 		self.nearScene.addItem(self.fieldItem)
 		self.drawFarField()
+                self.fieldScale = c_max/255.0
 	def plotFarField(self,fx):
 		p = QtGui.QPainterPath()
 		scale = np.max(fx)
@@ -748,19 +791,19 @@ class MainWindow(QtGui.QMainWindow):
 		p.moveTo(plot_start+(plot_width*fx[0])/scale,0)
 		for i in range(1,len(fx)):
 			p.lineTo(plot_start+(plot_width*fx[i])/scale,i)			
-		path = QtGui.QGraphicsPathItem(p)
+		path = QtWidgets.QGraphicsPathItem(p)
 		path.setPen(QtGui.QPen(self.skyBlue,3,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.plotObjects.append(path)
 		self.farScene.addItem(path)
 		path.setZValue(10)
-		line = QtGui.QGraphicsLineItem(plot_start,0,plot_start,self.sceneHeight)
+		line = QtWidgets.QGraphicsLineItem(plot_start,0,plot_start,self.sceneHeight)
 		line.setPen(QtGui.QPen(self.orange,1,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 		self.plotObjects.append(line)
 		self.farScene.addItem(line)
 		line.setZValue(9)
 
 
-#		path = QtGui.QGraphicsPathItem(p)
+#		path = QtWidgets.QGraphicsPathItem(p)
 #		path.setPen(QtGui.QPen(QtGui.QColor("#000000"),3,QtCore.Qt.SolidLine,QtCore.Qt.RoundCap,QtCore.Qt.RoundJoin))
 #		self.plotObjects.append(path)
 #		path.setZValue(5)
@@ -776,6 +819,9 @@ class MainWindow(QtGui.QMainWindow):
 		if(self.toolpanel.farFieldRadio.isChecked()):
 			self.topArgand.hide()
 			self.bottomArgand.hide()
+                        self.animationBox.hide()
+                        self.farScene.setSceneRect(0, 0,self.farSceneWidth, self.sceneHeight)
+                        self.farView.resize(self.farSceneWidth, self.sceneHeight)
 #			if(self.toolpanel.amplitudesRadio.isChecked()):
 #				fx = np.real(self.farE*np.exp(1.0j*math.pi*self.globalPhase/180.0))
 #				fx -= np.min(fx[:])
@@ -794,22 +840,29 @@ class MainWindow(QtGui.QMainWindow):
 			self.farFieldItem.setPixmap(pixmap.scaled(self.farSceneWidth,pixmap.height()))
 			self.farScene.addItem(self.farFieldItem)
 			self.plotFarField(fx)
+                        self.statusBar().showMessage("Integrated far field intensity = %d" % fx.sum())
+                        self.farScale = scale/255.0;
 		else:
 			self.topArgand.show()
 			self.bottomArgand.show()
+                        self.animationBox.show()
+                        self.farScene.setSceneRect(0, self.sceneHeight*1.0/5.0,self.farSceneWidth, self.sceneHeight)
+                        self.farView.resize(self.farSceneWidth, 4.0/5.0*self.sceneHeight)
 			fontSize = 18
 			x = int(self.pointSelection.x())
 			y = int(self.pointSelection.y())
-			E = np.real(self.E[y,x])
-			self.animationBox = QtGui.QGroupBox("Selected Point");
-			self.animationBox.resize(self.farSceneWidth,self.sceneHeight/5)
-			self.animationBox.setLayout(QtGui.QVBoxLayout())
+			E = np.abs(self.E[y,x])
+			#self.animationBox = QtWidgets.QGroupBox("Selected Point");
+			#self.animationBox.resize(self.farSceneWidth,self.sceneHeight/5)
+			#self.animationBox.setLayout(QtWidgets.QVBoxLayout())
 			self.animationBoxX.setText("Point x = "+str(x))
 			self.animationBoxY.setText("Point y = "+str(y))
-			self.animationBoxE.setText("E = %5.3g"%(E))
+			self.animationBoxE.setText("|E| = %5.3g"%(E))
 			self.animationBoxStep.setText("Calculation Step: %d" %(self.animationStep))
 			self.animationSlider.setValue(self.animationStep)
+                        self.animationSlider.setMinimum(1)
 			self.animationSlider.setMaximum(self.countSteps())
+                        self.farScene.update()
 	def onAnimationSliderValueChanged(self,newValue,multiStep = False):
 		if(not multiStep):
 			if(newValue > self.animationStep+1):
@@ -829,7 +882,7 @@ class MainWindow(QtGui.QMainWindow):
 		step += 1
 		for i in range(0,self.nrSources):	
 			if(self.animationStep <= step and newValue > step):
-				line = QtGui.QGraphicsLineItem(self.sourceX[i],self.sourcePositions[i],self.sourceX[i],self.sourcePositions[i])
+				line = QtWidgets.QGraphicsLineItem(self.sourceX[i],self.sourcePositions[i],self.sourceX[i],self.sourcePositions[i])
 				line.setZValue(10)
 				grad = QtGui.QRadialGradient(QtCore.QPointF(self.sourceX[i], self.sourcePositions[i]), self.wavelength);
 				grad.setColorAt(0, self.skyBlue)
@@ -842,7 +895,8 @@ class MainWindow(QtGui.QMainWindow):
 				self.sourceLines.append(line)
 				self.sourceTimers[i].start(20)
 				self.sourceTimers[i].step = 0
-				self.sourceTimers[i].maxStep = 100
+                                # Animation length
+				self.sourceTimers[i].maxStep = 400
 				self.sourceTimers[i].deltaX = (x-self.sourceX[i])
 				self.sourceTimers[i].deltaY = (y-self.sourcePositions[i])
 				self.nearScene.addItem(line)
@@ -859,12 +913,13 @@ class MainWindow(QtGui.QMainWindow):
 		if(newValue != self.animationStep):
 			self.animationStep = newValue
 			self.drawFarField()
+                self.drawFarField()
 	def resetAnimation(self):
 		self.animationStep = self.countSteps()
-		self.onAnimationSliderValueChanged(0,True)		
+		self.onAnimationSliderValueChanged(1,True)		
 		self.bottomArgand.hideHands()
 		self.topArgand.hand.hide()
-		self.topArgand.hand.setRotation(0)
+		self.topArgand.hand.setRotation(-self.phaseShift[0])
 		self.topArgand.hand.show()
 	def timeStep(self):
 		self.toolpanel.phaseDial.setValue(self.toolpanel.phaseDial.value()+5)
@@ -879,15 +934,19 @@ class MainWindow(QtGui.QMainWindow):
 		t = self.sender()
 		t.step += 1
 		self.sourceLines[i].setLine(self.sourceX[i],self.sourcePositions[i],self.sourceX[i]+float(t.step*t.deltaX)/t.maxStep,self.sourcePositions[i]+float(t.step*t.deltaY)/t.maxStep)
-		self.topArgand.hand.setRotation(-360*t.step*math.sqrt(t.deltaX**2+t.deltaY**2)/(t.maxStep*self.wavelength)-360*(self.sourceX[i]-self.baseX)/self.wavelength)
+		self.topArgand.hand.setRotation(-self.phaseShift[i]-360*t.step*math.sqrt(t.deltaX**2+t.deltaY**2)/(t.maxStep*self.wavelength)-360*(self.sourceX[i]-self.baseX)/self.wavelength)
 		if(t.step == t.maxStep):
-			self.bottomArgand.addSource(i,-360*t.step*math.sqrt(t.deltaX**2+t.deltaY**2)/(t.maxStep*self.wavelength))
+			self.bottomArgand.addSource(i,-self.phaseShift[i]-360*t.step*math.sqrt(t.deltaX**2+t.deltaY**2)/(t.maxStep*self.wavelength))
 			self.animationSlider.setEnabled(True);
 			t.stop()
 
+        def onSceneClick(self, mouseEvent):
+		#v  = (self.fieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
+                v  = (self.farFieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
+                self.statusBar().showMessage('Intensity = %f' % (v*self.farScale))  
 
 def main():
-	app = QtGui.QApplication(sys.argv)
+	app = QtWidgets.QApplication(sys.argv)
 	mw = MainWindow()
 	sys.exit(app.exec_())
 

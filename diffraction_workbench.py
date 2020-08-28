@@ -284,8 +284,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sourceTimers = [timer]
 
     def initField(self):
-        self.E = np.zeros((self.sceneHeight/self.downSampling,
-                           self.nearSceneWidth/self.downSampling,), complex)
+        self.E = np.zeros((self.sceneHeight//self.downSampling,
+                           self.nearSceneWidth//self.downSampling,), complex)
         self.pixmap = QtGui.QPixmap(self.E.shape[1], self.E.shape[0])
         self.Ex, self.Ey = np.meshgrid(np.arange(self.downSampling/2.0, self.E.shape[1]*self.downSampling, self.downSampling), np.arange(
             self.downSampling/2.0, self.E.shape[0]*self.downSampling, self.downSampling))
@@ -296,7 +296,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.calculateFieldTimer.setSingleShot(True)
         self.calculateFieldTimer.timeout.connect(self.calculateField)
 
-        self.farE = np.zeros((self.sceneHeight/self.downSampling), complex)
+        self.farE = np.zeros((self.sceneHeight//self.downSampling), complex)
 
     def initUI(self):
         hbox = QtWidgets.QHBoxLayout()

@@ -202,11 +202,8 @@ class MyScene(QtWidgets.QGraphicsScene):
                 super(MyScene, self).__init__(x,y,w,h)
                 self.parent = parent
         def mousePressEvent(self, mouseEvent):
-                mouseEvent.ignore()
-                return
                 if(QtWidgets.QApplication.activeWindow().toolpanel.farFieldRadio.isChecked()):
-                        print('here')                                               
-                        self.parent.onSceneClick(mouseEvent)
+                        self.parent.onSceneClick(mouseEvent,self)
                 else:
                         mouseEvent.ignore()
                 return
@@ -308,7 +305,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.sourceObjects = []
 		self.sourceLines = []
 
-		# scene = MyScene(self, 0, 0, self.nearSceneWidth, self.sceneHeight);
+		#scene = MyScene(self, 0, 0, self.nearSceneWidth, self.sceneHeight);
                 scene = QtWidgets.QGraphicsScene(0, 0, self.nearSceneWidth, self.sceneHeight);
 		graphicsView = QtWidgets.QGraphicsView(scene)
 		graphicsView.setBackgroundBrush(QtGui.QBrush(self.black))
@@ -327,8 +324,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		return graphicsView
 	def initFarView(self):
 		self.plotObjects = []
-		scene = QtWidgets.QGraphicsScene(0, 0, self.farSceneWidth, self.sceneHeight);
-                #scene = MyScene(self, 0, 0, self.farSceneWidth, self.sceneHeight);
+		#scene = QtWidgets.QGraphicsScene(0, 0, self.farSceneWidth, self.sceneHeight);
+                scene = MyScene(self, 0, 0, self.farSceneWidth, self.sceneHeight);
 		graphicsView = QtWidgets.QGraphicsView(scene)
 		graphicsView.setScene(scene)
 		graphicsView.setSizePolicy(QtWidgets.QSizePolicy.Fixed,QtWidgets.QSizePolicy.Maximum)
@@ -533,11 +530,17 @@ class MainWindow(QtWidgets.QMainWindow):
 		plotGroup.setLayout(QtWidgets.QVBoxLayout())
 
 		toolpanel.farFieldRadio = QtWidgets.QRadioButton("Far Field Intensities")
-		toolpanel.farFieldRadio.toggled.connect(self.onFarFieldRadioToggled)
 		toolpanel.pointCalculationRadio = QtWidgets.QRadioButton("Animate Calculation ")
 		toolpanel.pointCalculationRadio.setVisible(False)
-		toolpanel.farFieldRadio.setChecked(True)
+                toolpanel.normalizeFarFieldCheck = QtWidgets.QCheckBox("Normalize Far Field Intensities")
+		toolpanel.pointCalculationRadio.setVisible(False)
+                toolpanel.farFieldRadio.toggled.connect(self.onFarFieldRadioToggled)
+                toolpanel.normalizeFarFieldCheck.toggled.connect(self.drawFarField)
+                toolpanel.normalizeFarFieldCheck.setChecked(True)
+                toolpanel.farFieldRadio.setChecked(True)
+
 		plotGroup.layout().addWidget(toolpanel.farFieldRadio)
+                plotGroup.layout().addWidget(toolpanel.normalizeFarFieldCheck)
 		plotGroup.layout().addWidget(toolpanel.pointCalculationRadio)
 
 
@@ -784,6 +787,10 @@ class MainWindow(QtWidgets.QMainWindow):
 	def plotFarField(self,fx):
 		p = QtGui.QPainterPath()
 		scale = np.max(fx)
+                if(self.toolpanel.normalizeFarFieldCheck.isChecked()):
+                        scale = np.max(fx)
+                else:
+                        scale = 10.0
 		if(scale == 0):
 			scale = 1
 		plot_width = 140;
@@ -831,8 +838,11 @@ class MainWindow(QtWidgets.QMainWindow):
 			offset = 0
 			colormap = fx[:]-offset
 			scale = np.max(colormap[:])
-			if(scale != 0):
-				colormap *= 255.0/scale
+                        if(self.toolpanel.normalizeFarFieldCheck.isChecked()):
+			        if(scale != 0):
+				        colormap *= 255.0/scale
+                        else:
+                                colormap *= 255.0/10.0
 			colormap = colormap.astype(np.uint32)
 			colormap = (255 << 24 | colormap[:] << 16 | colormap[:] << 8 | colormap[:]).flatten()
 			im = QtGui.QImage(colormap, 1, self.farE.shape[0], QtGui.QImage.Format_RGB32)			
@@ -940,10 +950,14 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.animationSlider.setEnabled(True);
 			t.stop()
 
-        def onSceneClick(self, mouseEvent):
+        def onSceneClick(self, mouseEvent, scene):
 		#v  = (self.fieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
-                v  = (self.farFieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
-                self.statusBar().showMessage('Intensity = %f' % (v*self.farScale))  
+                if(scene == self.farScene):
+                        v  = (self.farFieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
+                        self.statusBar().showMessage('Intensity = %f' % (v*self.farScale))
+                if(scene == self.nearScene):
+                        v  = (self.fieldItem.pixmap().toImage().pixel(mouseEvent.scenePos().x(), mouseEvent.scenePos().y())%256)
+                        self.statusBar().showMessage('Intensity = %f' % (v*self.fieldScale))  
 
 def main():
 	app = QtWidgets.QApplication(sys.argv)
